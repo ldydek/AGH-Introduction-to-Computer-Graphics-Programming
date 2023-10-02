@@ -89,35 +89,23 @@
             // towards the camera. The other side is not rendered (backface culling). But this
             // performance optimization sometimes leads to wholes in the surface. When this happens
             // in your surface, simply set 'doubleSided' to 'true'.
-            var triangleMaterial = new THREE.MeshBasicMaterial({
+            var leavesMaterial = new THREE.MeshBasicMaterial({
                 color: 0x008000,
                 side: THREE.DoubleSide
             });
 
-            var triangleMaterial2 = new THREE.MeshBasicMaterial({
+            var roofMaterial = new THREE.MeshBasicMaterial({
                 color: 0xff0000,
                 side: THREE.DoubleSide
             });
 
             // Create a mesh and insert the geometry and the material. Translate the whole mesh
             // by -1.5 on the x axis and by 4 on the z axis. Finally add the mesh to the scene.
-            var triangleMesh = new THREE.Mesh(triangleGeometry, triangleMaterial);
-            triangleMesh.position.set(-5, 1.2, 0.0);
-            // triangleMesh.scale.set(2, 2, 1);
-            scene.add(triangleMesh);
+            var leavesMesh1 = new THREE.Mesh(triangleGeometry, leavesMaterial);
+            var leavesMesh2 = new THREE.Mesh(triangleGeometry, leavesMaterial);
+            var leavesMesh3 = new THREE.Mesh(triangleGeometry, leavesMaterial);
 
-            var triangleMesh1 = new THREE.Mesh(triangleGeometry, triangleMaterial);
-            triangleMesh1.position.set(-5, 0, 0);
-            scene.add(triangleMesh1);
-
-            var triangleMesh2 = new THREE.Mesh(triangleGeometry, triangleMaterial);
-            triangleMesh2.position.set(-5, -1.2, 0);
-            scene.add(triangleMesh2);
-
-            var triangleMesh3 = new THREE.Mesh(triangleGeometry, triangleMaterial2);
-            triangleMesh3.position.set(3, 2, 0);
-            triangleMesh3.scale.set(2, 2, 1);
-            scene.add(triangleMesh3);
+            var roofMesh = new THREE.Mesh(triangleGeometry, roofMaterial);
 
             // The creation of the square is done in the same way as the triangle.
             // 1. Instantiate the geometry object
@@ -139,11 +127,87 @@
                 side: THREE.DoubleSide
             });
 
+            var doorMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                side: THREE.DoubleSide
+            });
+
             // Create a mesh and insert the geometry and the material. Translate the whole mesh
             // by 1.5 on the x axis and by 4 on the z axis and add the mesh to the scene.
-            var squareMesh = new THREE.Mesh(squareGeometry, squareMaterial);
-            squareMesh.position.set(1.5, -1, 5.0);
-            scene.add(squareMesh);
+            var wallMesh = new THREE.Mesh(squareGeometry, squareMaterial);
+            var trunkMesh = new THREE.Mesh(squareGeometry, squareMaterial);
+            var doorMesh = new THREE.Mesh(squareGeometry, doorMaterial);
+
+            // creating tree and adding elements to scene below
+            const tree = [
+                leavesMesh1,
+                leavesMesh2,
+                leavesMesh3,
+                trunkMesh
+            ]
+
+            let treeElementsSpace = 0;
+
+            for (var item of tree) {
+                scene.add(item);
+                if (item == trunkMesh) {
+                    trunkMesh.scale.set(0.25, 0.5, 0);
+                    trunkMesh.position.set(-5, -2.7, 0);
+                    continue;
+                }
+                item.position.set(-5, 1.2 - treeElementsSpace, 0);
+                treeElementsSpace += 1.2;
+            }
+
+            // creting house and adding elements to scene below
+            const house = [
+                wallMesh,
+                doorMesh,
+                roofMesh,
+            ]
+
+            wallMesh.position.set(1.5, -1, 5.0);
+            doorMesh.position.set(1.5, -1.7, 5.0);
+            doorMesh.scale.set(0.2, 0.3, 1);
+            roofMesh.position.set(3, 2, 0);
+            roofMesh.scale.set(2.5, 2, 1);
+
+            for (var item of house) {
+                scene.add(item);
+            }
+
+            // creating car and adding elements to scene below
+
+            var circleGeometry = new THREE.CircleGeometry(0.5, 32);
+
+            var carSideMaterial = new THREE.MeshBasicMaterial({
+                color: 0xFF0000,
+                side: THREE.DoubleSide
+            });
+
+            var carWheelMaterial = new THREE.MeshBasicMaterial({
+                color: 0x808080,
+                side: THREE.DoubleSide
+            });
+
+            var firstWheel = new THREE.Mesh(circleGeometry, carWheelMaterial);
+            var secondWheel = new THREE.Mesh(circleGeometry, carWheelMaterial);
+            var carSide = new THREE.Mesh(squareGeometry, carSideMaterial);
+
+            const car = [firstWheel, secondWheel, carSide];
+            let spaceBetweenWheels = 0;
+
+            for (let item of car) {
+                scene.add(item);
+                if (item == carSide) {
+                    carSide.scale.set(2, 0.2, 1);
+                    carSide.position.set(2.9, -5.3, 1);
+                    continue;
+                }
+                item.position.set(2 + spaceBetweenWheels, -6, 1);
+                spaceBetweenWheels += 2;
+                console.log(spaceBetweenWheels);
+            } 
         }
 
         /**
@@ -152,6 +216,8 @@
         function renderScene() {
             renderer.render(scene, camera);
         }
+
+        // geometry -> meshBasicMaterial -> mesh
     </script>
 </body>
 
