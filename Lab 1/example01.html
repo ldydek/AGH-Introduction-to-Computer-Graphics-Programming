@@ -36,6 +36,8 @@
         var camera;
 
         var car;
+        var tree;
+        var forward = true;
 
         // Initialize the scene
         initializeScene();
@@ -143,7 +145,7 @@
             var doorMesh = new THREE.Mesh(squareGeometry, doorMaterial);
 
             // creating tree and adding elements to scene below
-            const tree = [
+            tree = [
                 leavesMesh1,
                 leavesMesh2,
                 leavesMesh3,
@@ -221,9 +223,34 @@
         }
 
         function animateScene() {
-            car[0].position.x -= 0.1;
-            car[1].position.x -= 0.1;
-            car[2].position.x -= 0.1;
+            let carVelocity = 0.04;
+            for (let index in car) {
+                car[index].position.x -= carVelocity;
+                if (forward)  {
+                    car[0].position.x -= carVelocity;
+                    car[1].position.x -= carVelocity;
+                    car[2].position.x -= carVelocity;
+                    if (car[0].position.x < -10) {
+                        forward = false;
+                    }
+                } else {
+                    car[0].position.x += carVelocity;
+                    car[1].position.x += carVelocity;
+                    car[2].position.x += carVelocity;
+                    if (car[0].position.x > 10) {
+                        forward = true;
+                    }
+                }
+            }
+
+            for (let index in tree) {
+                if (index % 2 == 0) {
+                    tree[index].rotation.y -= 0.05;
+                } else {
+                    tree[index].rotation.y -= 0.1;
+                }
+            }
+
             requestAnimationFrame(animateScene);
             renderScene();
         }
