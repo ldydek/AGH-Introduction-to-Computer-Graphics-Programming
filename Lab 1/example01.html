@@ -35,11 +35,15 @@
         // Global camera object
         var camera;
 
+        var car;
+
         // Initialize the scene
         initializeScene();
 
         // Render the scene (map the 3D world to the 2D scene)
         renderScene();
+
+        animateScene();
 
         /**
          * Initialize the scene.
@@ -194,7 +198,7 @@
             var secondWheel = new THREE.Mesh(circleGeometry, carWheelMaterial);
             var carSide = new THREE.Mesh(squareGeometry, carSideMaterial);
 
-            const car = [firstWheel, secondWheel, carSide];
+            car = [firstWheel, secondWheel, carSide];
             let spaceBetweenWheels = 0;
 
             for (let item of car) {
@@ -206,8 +210,7 @@
                 }
                 item.position.set(2 + spaceBetweenWheels, -6, 1);
                 spaceBetweenWheels += 2;
-                console.log(spaceBetweenWheels);
-            } 
+            }
         }
 
         /**
@@ -215,6 +218,14 @@
          */
         function renderScene() {
             renderer.render(scene, camera);
+        }
+
+        function animateScene() {
+            car[0].position.x -= 0.1;
+            car[1].position.x -= 0.1;
+            car[2].position.x -= 0.1;
+            requestAnimationFrame(animateScene);
+            renderScene();
         }
 
         // geometry -> meshBasicMaterial -> mesh
