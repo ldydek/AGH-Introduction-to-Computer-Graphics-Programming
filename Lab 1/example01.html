@@ -85,6 +85,10 @@
             triangleGeometry.vertices.push(new THREE.Vector3(1.0, -1.0, 0.0));
             triangleGeometry.faces.push(new THREE.Face3(0, 1, 2));
 
+            var coneGeometry = new THREE.ConeGeometry(1, 2, 8, 2);
+            var boxGeometry = new THREE.BoxGeometry(1.5, 3, 1.5);
+
+
             // To color the surface, a material has to be created.
             // We use MeshBasicMaterial				 
             // from which we need in this example only 'color'.
@@ -107,9 +111,9 @@
 
             // Create a mesh and insert the geometry and the material. Translate the whole mesh
             // by -1.5 on the x axis and by 4 on the z axis. Finally add the mesh to the scene.
-            var leavesMesh1 = new THREE.Mesh(triangleGeometry, leavesMaterial);
-            var leavesMesh2 = new THREE.Mesh(triangleGeometry, leavesMaterial);
-            var leavesMesh3 = new THREE.Mesh(triangleGeometry, leavesMaterial);
+            var leavesMesh1 = new THREE.Mesh(coneGeometry, leavesMaterial);
+            var leavesMesh2 = new THREE.Mesh(coneGeometry, leavesMaterial);
+            var leavesMesh3 = new THREE.Mesh(coneGeometry, leavesMaterial);
 
             var roofMesh = new THREE.Mesh(triangleGeometry, roofMaterial);
 
@@ -141,10 +145,11 @@
             // Create a mesh and insert the geometry and the material. Translate the whole mesh
             // by 1.5 on the x axis and by 4 on the z axis and add the mesh to the scene.
             var wallMesh = new THREE.Mesh(squareGeometry, squareMaterial);
-            var trunkMesh = new THREE.Mesh(squareGeometry, squareMaterial);
+            var trunkMesh = new THREE.Mesh(boxGeometry, squareMaterial);
             var doorMesh = new THREE.Mesh(squareGeometry, doorMaterial);
 
             // creating tree and adding elements to scene below
+
             tree = [
                 leavesMesh1,
                 leavesMesh2,
@@ -165,7 +170,8 @@
                 treeElementsSpace += 1.2;
             }
 
-            // creting house and adding elements to scene below
+            // creating house and adding elements to scene below
+
             const house = [
                 wallMesh,
                 doorMesh,
@@ -226,7 +232,7 @@
             let carVelocity = 0.04;
             for (let index in car) {
                 car[index].position.x -= carVelocity;
-                if (forward)  {
+                if (forward) {
                     car[0].position.x -= carVelocity;
                     car[1].position.x -= carVelocity;
                     car[2].position.x -= carVelocity;
