@@ -8,7 +8,7 @@
     <script type="text/javascript" src="jquery-1.9.0.js"></script>
     <script type="text/javascript" src="stats.js"></script>
     <script type="text/javascript" src="dat.gui.js"></script>
-	<script type="text/javascript" src="OrbitControls.js"></script>
+    <script type="text/javascript" src="OrbitControls.js"></script>
     <style>
         body {
             /* set margin to 0 and overflow to hidden, to go fullscreen */
@@ -17,18 +17,19 @@
         }
     </style>
 </head>
+
 <body>
 
-<div id="Stats-output">
-</div>
-<!-- Div which will hold the Output -->
-<div id="WebGL-output">
-</div>
+    <div id="Stats-output">
+    </div>
+    <!-- Div which will hold the Output -->
+    <div id="WebGL-output">
+    </div>
 
-<!-- Javascript code that runs our Three.js examples -->
-<script type="text/javascript">
+    <!-- Javascript code that runs our Three.js examples -->
+    <script type="text/javascript">
 
-    
+
         var stats = initStats();
 
         // create a scene, that will hold all our elements such as objects, cameras and lights.
@@ -36,23 +37,28 @@
 
         // create a camera, which defines where we're looking at.
         var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-		
+
 
         // create a render and set the size
         var renderer = new THREE.WebGLRenderer();
 
+        var movingRight = true;
+
         renderer.setClearColor(new THREE.Color(0xEEEEEE));  //background color and opacity
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;   // false is default
-		renderer.autoClear = true;          // default
-		renderer.autoClearColor = true;     // default
-		
-		ctr = new THREE.OrbitControls( camera, renderer.domElement);
+        renderer.autoClear = true;          // default
+        renderer.autoClearColor = true;     // default
+
+        ctr = new THREE.OrbitControls(camera, renderer.domElement);
 
         // create the ground plane
-        var planeGeometry = new THREE.PlaneGeometry(60, 20, 15, 5);
-        var planeMaterial = new THREE.MeshLambertMaterial({color: 0xffffff, side:THREE.DoubleSide});
+        var planeGeometry = new THREE.PlaneGeometry(60, 60, 60, 5);
+        var planeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide });
         var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        var plane2 = new THREE.Mesh(planeGeometry, planeMaterial);
+        var plane3 = new THREE.Mesh(planeGeometry, planeMaterial);
+        var plane4 = new THREE.Mesh(planeGeometry, planeMaterial);
         plane.receiveShadow = true;
 
         // rotate and position the plane
@@ -61,31 +67,63 @@
         plane.position.y = 0
         plane.position.z = 0
 
+        plane2.receiveShadow = true;
+        plane2.position.x = 15
+        plane2.position.y = 30
+        plane2.position.z = 30
+
+        plane3.receiveShadow = true;
+        plane3.position.x = 15
+        plane3.position.y = 30
+        plane3.position.z = -30
+
+        plane4.rotation.y = -0.5 * Math.PI;
+        plane4.receiveShadow = true;
+        plane4.position.x = 45
+        plane4.position.y = 30
+        plane4.position.z = 0
+
+        // add the plane to the scene
+        scene.add(plane);
+        scene.add(plane2);
+        scene.add(plane3);
+        scene.add(plane4);
+
         // add the plane to the scene
         scene.add(plane);
 
-        // create a cube
+        // create cubes
         var cubeGeometry = new THREE.CubeGeometry(4, 4, 4);
-        var cubeMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
+        var cubeMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
         var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
         cube.castShadow = true;
 
         // position the cube
         cube.position.x = -4;
-        cube.position.y = 3;
+        cube.position.y = 10;
         cube.position.z = 0;
 
         // add the cube to the scene
         scene.add(cube);
 
+        var cube2 = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cube2.castShadow = true;
+
+        cube2.position.x = 20;
+        cube2.position.y = 2;
+        cube2.position.z = 0;
+
+        scene.add(cube2);
+
         var sphereGeometry = new THREE.SphereGeometry(4, 20, 20);
-        var sphereMaterial = new THREE.MeshLambertMaterial({color: 0x7777ff, specular:true, shininess:100});
+        var sphereMaterial = new THREE.MeshPhongMaterial({ color: 0x7777ff, specular: true, shininess: 100 });
         var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 
         // position the sphere
         sphere.position.x = 20;
         sphere.position.y = 0;
         sphere.position.z = 2;
+        sphere.receiveShadow = true;
         sphere.castShadow = true;
 
         // add the sphere to the scene
@@ -102,24 +140,57 @@
         var ambientLight = new THREE.AmbientLight(ambiColor);
         scene.add(ambientLight);
 
-        // add spotlight for the shadows
-        var spotLight = new THREE.SpotLight(0xffffff);
-        spotLight.position.set(-40, 60, -10);
+        // add spotlights for the shadows
+        var spotLight = new THREE.SpotLight(0xFFA500);
+        spotLight.position.set(-30, 10, 0);
         spotLight.castShadow = true;
-		  
-		//spotLight.angle = 0.2;
-		//spotLight.penumbra = .7;
-		//spotLight.target = sphere;
-		//var helper = new THREE.CameraHelper( spotLight.shadow.camera );
-        //scene.add( helper );
-		//spotLight.shadow.camera.near = 0.1;
-		//spotLight.shadow.camera.far = 100;
-		//spotLight.shadow.camera.fov = 60;
-		//spotLight.shadow.mapSize.width = 2048;
-		//spotLight.shadow.mapSize.height = 2048;
-		
-        		
+
+        // var helper = new THREE.CameraHelper(spotLight.shadow.camera);
+        // scene.add(helper);
+
+        spotLight.angle = 0.25;
+        spotLight.penumbra = .7;
+        spotLight.target = cube;
+
+        spotLight.shadow.camera.near = 0.1;
+        spotLight.shadow.camera.far = 100;
+        spotLight.shadow.camera.fov = 60;
+        spotLight.shadow.mapSize.width = 2048;
+        spotLight.shadow.mapSize.height = 2048;
+
         scene.add(spotLight);
+
+        var spotLight2 = new THREE.SpotLight(0xFFA500);
+        spotLight2.position.set(30, 5, 30);
+        spotLight2.castShadow = true;
+
+        spotLight2.angle = 0.25;
+        spotLight2.penumbra = .7;
+        spotLight2.target = cube2;
+
+        spotLight2.shadow.camera.near = 0.1;
+        spotLight2.shadow.camera.far = 100;
+        spotLight2.shadow.camera.fov = 60;
+        spotLight2.shadow.mapSize.width = 2048;
+        spotLight2.shadow.mapSize.height = 2048;
+
+        scene.add(spotLight2);
+
+        var spotLight3 = new THREE.SpotLight(0xFFA500);
+        spotLight3.position.set(30, 5, -30);
+        spotLight3.castShadow = true;
+
+        spotLight3.angle = 0.25;
+        spotLight3.penumbra = .7;
+        spotLight3.target = cube2;
+
+        spotLight3.shadow.camera.near = 0.1;
+        spotLight3.shadow.camera.far = 100;
+        spotLight3.shadow.camera.fov = 60;
+        spotLight3.shadow.mapSize.width = 2048;
+        spotLight3.shadow.mapSize.height = 2048;
+
+        scene.add(spotLight3);
 
         // add the output of the renderer to the html element
         $("#WebGL-output").append(renderer.domElement);
@@ -150,8 +221,23 @@
 
             // bounce the sphere up and down
             step += controls.bouncingSpeed;
-            sphere.position.x = 20 + ( 10 * (Math.cos(step)));
-            sphere.position.y = 2 + ( 10 * Math.abs(Math.sin(step)));
+            sphere.position.x = 20 + (10 * (Math.cos(step)));
+            sphere.position.y = 2 + (10 * Math.abs(Math.sin(step)));
+
+            // move second cude
+
+            if (movingRight == true) {
+                cube2.position.z += 0.3;
+                if (cube2.position.z > 20) {
+                    movingRight = false;
+                }
+            }
+            if (movingRight == false) {
+                cube2.position.z -= 0.3;
+                if (cube2.position.z < -20) {
+                    movingRight = true;
+                }
+            }
 
             // render using requestAnimationFrame
             requestAnimationFrame(render);
@@ -173,9 +259,10 @@
 
             return stats;
         }
-  
 
 
-</script>
+
+    </script>
 </body>
+
 </html>
