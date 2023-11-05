@@ -52,6 +52,8 @@
 		var mirrorCube, mirrorCubeCamera; // for mirror material
 		var mirrorSphere, mirrorSphereCamera; // for mirror material
 
+		var directionToEachOther = true; // for transparent blocks collision
+
 		init();
 		animate();
 
@@ -119,20 +121,37 @@
 			// CUSTOM //
 			////////////
 
+			polyhedron = createMesh(new THREE.IcosahedronGeometry(45, 0), "metal-rust.jpg");
+			polyhedron.position.set(-150, 50, 150);
+			scene.add(polyhedron);
 
-			var cubeGeom = new THREE.CubeGeometry(200, 200, 30, 1, 1, 1);
-			mirrorCubeCamera = new THREE.CubeCamera(0.1, 5000, 512);
+			sphere = createMesh(new THREE.SphereGeometry(45, 75, 65), "floor-wood.jpg");
+			sphere.position.set(250, 50, -200)
+			scene.add(sphere);
+
+			cube = createTransparentMesh(new THREE.CubeGeometry(50, 50, 50));
+			cube.position.set(100, 50, 150);
+			scene.add(cube);
+
+			cubeBump = createMesh(new THREE.CubeGeometry(15, 100, 15), "stone.jpg", "stone-bump.jpg");
+			cubeBump.position.set(0, 50, 150)
+			scene.add(cubeBump);
+
+
+			var cubeGeom = new THREE.CubeGeometry(200, 200, 30, 50, 50, 50);
+			mirrorCubeCamera = new THREE.CubeCamera(0.1, 5000, 1500);
 			// mirrorCubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
 			scene.add(mirrorCubeCamera);
 			var mirrorCubeMaterial = new THREE.MeshBasicMaterial({ envMap: mirrorCubeCamera.renderTarget });
 			mirrorCube = new THREE.Mesh(cubeGeom, mirrorCubeMaterial);
 			mirrorCube.position.set(-75, 50, 0);
+			mirrorCube.rotation.y = 90 * (Math.PI / 180);
 			//mirrorCubeCamera.position = mirrorCube.position;    not working with new three.js
 			mirrorCubeCamera.position.set(-75, 50, 0);
 			scene.add(mirrorCube);
 
 			var sphereGeom = new THREE.SphereGeometry(50, 32, 16); // radius, segmentsWidth, segmentsHeight
-			mirrorSphereCamera = new THREE.CubeCamera(0.1, 5000, 512);
+			mirrorSphereCamera = new THREE.CubeCamera(10, 5000, 1500);
 			// mirrorCubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
 			scene.add(mirrorSphereCamera);
 			var mirrorSphereMaterial = new THREE.MeshBasicMaterial({ envMap: mirrorSphereCamera.renderTarget });
@@ -144,7 +163,53 @@
 
 		}
 
+		function createMesh(geom, imageFile, bump) {
+			var texture = THREE.ImageUtils.loadTexture("textures/" + imageFile)
+			geom.computeVertexNormals();
+			var mat = new THREE.MeshPhongMaterial();
+			mat.map = texture;
+
+			if (bump) {
+				var bump = THREE.ImageUtils.loadTexture("textures/" + bump)
+				mat.bumpMap = bump;
+				mat.bumpScale = 0.2;
+			}
+
+			return new THREE.Mesh(geom, mat);
+		}
+
+		function createTransparentMesh(geom) {
+			var transparentMaterial = new THREE.MeshPhongMaterial({
+				color: 0x00ff00,
+				opacity: 0.5,
+				transparent: true
+			});
+			return new THREE.Mesh(geom, transparentMaterial);
+		}
+
 		function animate() {
+			var step = 0.1;
+			if (directionToEachOther) {
+				mirrorCube.position.x += step;
+				mirrorSphere.position.x -= step;
+				if (mirrorSphere.position.x - 30 <= mirrorCube.position.x + 33) {
+					directionToEachOther = false;
+				}
+			} else {
+				mirrorCube.position.x -= step;
+				mirrorSphere.position.x += step;
+				if ((mirrorSphere.position.x >= 75) || (mirrorCube.position.x <= -75)) {
+					directionToEachOther = true;
+				}
+			}
+			polyhedron.rotation.y += step / 10;
+			polyhedron.rotation.x += step / 10;
+			cube.rotation.y += step / 10;
+			cube.rotation.x += step / 10;
+			sphere.rotation.y += step / 5;
+			sphere.rotation.x += step / 5;
+			cubeBump.rotation.x += step / 10;
+
 			requestAnimationFrame(animate);
 			render();
 			update();
