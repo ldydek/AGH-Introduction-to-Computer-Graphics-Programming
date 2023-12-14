@@ -26,7 +26,7 @@
 
 		var clock = new THREE.Clock();
 
-		var mixer;
+		var mixer, mixer2;
 
 		init();
 		animate();
@@ -41,7 +41,7 @@
 
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color(0xa0a0a0);
-			scene.fog = new THREE.Fog(0xa0a0a0, 200, 1000);
+			scene.fog = new THREE.Fog(0xa0a0a0, 0, 2000);
 
 			light = new THREE.HemisphereLight(0xffffff, 0x444444);
 			light.position.set(0, 200, 0);
@@ -69,13 +69,14 @@
 			grid.material.transparent = true;
 			scene.add(grid);
 
-			// model
+			// archer model
 			var loader = new THREE.FBXLoader();
-			loader.load('models/fbx/Samba Dancing.fbx', function (object) {
+			loader.load('models/fbx/Shooting Arrow.fbx', function (object) {
 
 				mixer = new THREE.AnimationMixer(object);
 
 				var action = mixer.clipAction(object.animations[0]);
+				action.setEffectiveTimeScale(2);
 				action.play();
 
 				object.traverse(function (child) {
@@ -89,6 +90,32 @@
 
 				});
 
+				scene.add(object);
+
+			});
+
+			// guy with cigarette model
+			var loader2 = new THREE.FBXLoader();
+			loader2.load('models/fbx/Sweep Fall.fbx', function (object) {
+
+				mixer2 = new THREE.AnimationMixer(object);
+
+				var action2 = mixer2.clipAction(object.animations[0]);
+				action2.play();
+
+				object.traverse(function (child) {
+
+					if (child.isMesh) {
+
+						child.castShadow = true;
+						child.receiveShadow = true;
+
+					}
+
+				});
+
+				object.position.set(0, 0, 250);
+				object.rotation.set(0, Math.PI, 0);
 				scene.add(object);
 
 			});
@@ -129,6 +156,8 @@
 			var delta = clock.getDelta();
 
 			if (mixer) mixer.update(delta);
+
+			if (mixer2) mixer2.update(delta);
 
 			renderer.render(scene, camera);
 
